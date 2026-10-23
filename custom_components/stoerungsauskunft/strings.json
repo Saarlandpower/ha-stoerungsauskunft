@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Störungsauskunft",
+        "description": "Reports power, gas, water and district-heating outages from störungsauskunft.de. Add several entries for several areas.",
+        "data": {
+          "name": "Name (optional)",
+          "area": "Area",
+          "postal_codes": "Postal codes",
+          "sectors": "Sectors"
+        },
+        "data_description": {
+          "postal_codes": "Only for 'Custom postal codes': comma separated. Fewer than 5 digits act as a prefix (e.g. 664)."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "störungsauskunft.de is unreachable or changed its frontend.",
+      "no_postal_codes": "Please enter at least one postal code.",
+      "no_sectors": "Please select at least one sector."
+    },
+    "abort": {
+      "already_configured": "This area is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "area": "Area",
+          "postal_codes": "Postal codes",
+          "sectors": "Sectors",
+          "scan_interval": "Update interval",
+          "window_minutes": "Window for report clusters",
+          "min_reports": "Minimum reports",
+          "min_addresses": "Minimum distinct addresses",
+          "quiet_minutes": "Cluster ends after … without new reports"
+        },
+        "data_description": {
+          "postal_codes": "Only for 'Custom postal codes': comma separated. Fewer than 5 digits act as a prefix (e.g. 664).",
+          "scan_interval": "At least 5 minutes to spare the website.",
+          "window_minutes": "A cluster counts as a possible outage when enough reports from enough addresses arrive within this window."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "störungsauskunft.de is unreachable or changed its frontend.",
+      "no_postal_codes": "Please enter at least one postal code.",
+      "no_sectors": "Please select at least one sector."
+    }
+  },
+  "selector": {
+    "area": {
+      "options": {
+        "saarland": "All of Saarland",
+        "custom": "Custom postal codes"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outages": {
+        "name": "{sector} official outages"
+      },
+      "reports": {
+        "name": "{sector} citizen reports"
+      }
+    },
+    "binary_sensor": {
+      "problem": {
+        "name": "{sector} outage"
+      }
+    }
+  }
+}

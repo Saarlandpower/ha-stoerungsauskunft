@@ -1,0 +1,12 @@
+{
+  "domain": "stoerungsauskunft",
+  "name": "Störungsauskunft",
+  "codeowners": ["@Saarlandpower"],
+  "config_flow": true,
+  "documentation": "https://github.com/Saarlandpower/ha-stoerungsauskunft",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/Saarlandpower/ha-stoerungsauskunft/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

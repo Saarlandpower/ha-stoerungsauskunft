@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Störungsauskunft",
+        "description": "Meldet Strom-, Gas-, Wasser- und Fernwärmestörungen von störungsauskunft.de. Für mehrere Gebiete (z. B. ganzes Saarland und dein Wohnort) einfach mehrere Einträge anlegen.",
+        "data": {
+          "name": "Name (optional)",
+          "area": "Gebiet",
+          "postal_codes": "Postleitzahlen",
+          "sectors": "Sparten"
+        },
+        "data_description": {
+          "postal_codes": "Nur bei „Eigene PLZ“: durch Komma getrennt. Weniger als 5 Ziffern gelten als Präfix (z. B. 664 = alle PLZ ab 664)."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "störungsauskunft.de ist nicht erreichbar oder hat das Frontend geändert.",
+      "no_postal_codes": "Bitte mindestens eine Postleitzahl angeben.",
+      "no_sectors": "Bitte mindestens eine Sparte wählen."
+    },
+    "abort": {
+      "already_configured": "Dieses Gebiet ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "data": {
+          "area": "Gebiet",
+          "postal_codes": "Postleitzahlen",
+          "sectors": "Sparten",
+          "scan_interval": "Abrufintervall",
+          "window_minutes": "Zeitfenster für Häufungen",
+          "min_reports": "Mindestanzahl Meldungen",
+          "min_addresses": "Mindestanzahl verschiedener Adressen",
+          "quiet_minutes": "Häufung beendet nach … ohne neue Meldung"
+        },
+        "data_description": {
+          "postal_codes": "Nur bei „Eigene PLZ“: durch Komma getrennt. Weniger als 5 Ziffern gelten als Präfix (z. B. 664 = alle PLZ ab 664).",
+          "scan_interval": "Mindestens 5 Minuten, um die Website zu schonen.",
+          "window_minutes": "Eine Häufung gilt als möglicher Ausfall, wenn innerhalb dieses Fensters genug Meldungen von genug Adressen eingehen."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "störungsauskunft.de ist nicht erreichbar oder hat das Frontend geändert.",
+      "no_postal_codes": "Bitte mindestens eine Postleitzahl angeben.",
+      "no_sectors": "Bitte mindestens eine Sparte wählen."
+    }
+  },
+  "selector": {
+    "area": {
+      "options": {
+        "saarland": "Ganzes Saarland",
+        "custom": "Eigene PLZ"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outages": {
+        "name": "{sector} offizielle Störungen"
+      },
+      "reports": {
+        "name": "{sector} Bürgermeldungen"
+      }
+    },
+    "binary_sensor": {
+      "problem": {
+        "name": "{sector} Störung"
+      }
+    }
+  }
+}
