@@ -46,23 +46,85 @@ Für mehrere Gebiete einfach mehrere Einträge anlegen, z. B. „Saarland“ fü
 
 Die Ereignisdaten enthalten `sector` (`strom`, `gas`, `wasser`, `fernwaerme`), `postal_code`, `city`, `operator` und die Zeiten. Beim Start von Home Assistant wird nur der aktuelle Stand gemerkt, es gibt also keine Ereignisflut nach einem Neustart.
 
+Eine Automation für alle drei Ereignisse und alle Sparten (Vorschlag von Ferdy Berger, leicht erweitert). Gerät in `notify.mobile_app_handy` anpassen; die Sparten in der Bedingung nach Bedarf kürzen.
+
 ```yaml
-automation:
-  - alias: Stromausfall in der Nähe
-    triggers:
-      - trigger: event
-        event_type: stoerungsauskunft_outage_new
-        event_data:
-          sector: strom
-    actions:
-      - action: notify.mobile_app_handy
-        data:
-          title: "⚡ Stromausfall {{ trigger.event.data.postal_code }} {{ trigger.event.data.city }}"
-          message: >-
-            {{ trigger.event.data.operator or 'Netzbetreiber unbekannt' }},
-            seit {{ as_datetime(trigger.event.data.start).strftime('%H:%M') }}
-            {%- if trigger.event.data.end %}, Ende vsl. {{ as_datetime(trigger.event.data.end).strftime('%H:%M') }}{% endif %}
+alias: "Notify: Störungsauskunft"
+description: >-
+  Neue und behobene offizielle Störungen sowie auffällige Häufungen von
+  Bürgermeldungen (Strom, Gas, Wasser).
+mode: parallel
+max: 10
+triggers:
+  - trigger: event
+    event_type: stoerungsauskunft_outage_new
+    id: new
+  - trigger: event
+    event_type: stoerungsauskunft_outage_resolved
+    id: resolved
+  - trigger: event
+    event_type: stoerungsauskunft_suspected
+    id: suspected
+conditions:
+  - condition: template
+    value_template: "{{ trigger.event.data.get('sector') in ['strom', 'gas', 'wasser'] }}"
+actions:
+  - variables:
+      d: "{{ trigger.event.data }}"
+      label: >-
+        {{ {'strom': 'Stromausfall', 'gas': 'Gasstörung', 'wasser': 'Wasserstörung',
+            'fernwaerme': 'Fernwärmestörung'}.get(d.get('sector'), 'Störung') }}
+      maybe: >-
+        {{ {'strom': 'Möglicher Stromausfall', 'gas': 'Mögliche Gasstörung', 'wasser': 'Mögliche Wasserstörung',
+            'fernwaerme': 'Mögliche Fernwärmestörung'}.get(d.get('sector'), 'Mögliche Störung') }}
+      icon: "{{ {'strom': '⚡', 'gas': '🔥', 'wasser': '💧', 'fernwaerme': '♨️'}.get(d.get('sector'), '⚠️') }}"
+      place: "{{ [d.get('postal_code'), d.get('city'), d.get('district')] | select | join(' ') }}"
+      operator: "{{ d.get('operator') or 'Netzbetreiber unbekannt' }}"
+      start_time: >-
+        {% set t = as_datetime(d.get('start') or d.get('since'), none) %}{{ as_local(t).strftime('%H:%M') if t else '' }}
+      end_time: >-
+        {% set t = as_datetime(d.get('end'), none) %}{{ as_local(t).strftime('%H:%M') if t else '' }}
+      # gleicher Tag -> "behoben" ersetzt auf dem Handy die Störungsmeldung
+      tag: "stoerung-{{ d.get('sector') }}-{{ d.get('postal_code') }}"
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: new
+        sequence:
+          - action: notify.mobile_app_handy
+            data:
+              title: "{{ icon }} {{ label }} {{ place }}"
+              message: >-
+                {{ operator }}{% if start_time %}, seit {{ start_time }}{% endif %}
+                {%- if end_time %}, Ende vsl. {{ end_time }}{% endif %}
+              data:
+                tag: "{{ tag }}"
+      - conditions:
+          - condition: trigger
+            id: resolved
+        sequence:
+          - action: notify.mobile_app_handy
+            data:
+              title: "✅ {{ label }} behoben {{ place }}"
+              message: "{{ operator }}: keine offizielle Störung mehr gemeldet."
+              data:
+                tag: "{{ tag }}"
+      - conditions:
+          - condition: trigger
+            id: suspected
+        sequence:
+          - action: notify.mobile_app_handy
+            data:
+              title: "{{ icon }} {{ maybe }} {{ place }}"
+              message: >-
+                {{ d.get('reports') }} Bürgermeldungen von {{ d.get('addresses') }} Adressen
+                seit {{ start_time }}, {{ 'vom Netzbetreiber bestätigt' if d.get('confirmed')
+                else 'noch nicht offiziell bestätigt' }}.
+              data:
+                tag: "{{ tag }}"
 ```
+
+Hinweis: Hast du mehrere Einträge mit überlappenden Gebieten (z. B. „Saarland“ und deine eigene PLZ), feuert jedes Ereignis einmal pro Eintrag. Dann in der Bedingung zusätzlich auf einen Eintrag filtern, z. B. `trigger.event.data.config_entry_id == '…'` (die ID steht in der Adresszeile, wenn du den Eintrag unter Einstellungen → Geräte & Dienste → Störungsauskunft öffnest: `…#config_entry=<ID>`).
 
 ## Entwicklung
 
