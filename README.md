@@ -46,7 +46,7 @@ Für mehrere Gebiete einfach mehrere Einträge anlegen, z. B. „Saarland“ fü
 
 Die Ereignisdaten enthalten `sector` (`strom`, `gas`, `wasser`, `fernwaerme`), `postal_code`, `city`, `operator` und die Zeiten. Beim Start von Home Assistant wird nur der aktuelle Stand gemerkt, es gibt also keine Ereignisflut nach einem Neustart.
 
-Eine Automation für alle drei Ereignisse und alle Sparten (Vorschlag von Ferdy Berger, leicht erweitert). Gerät in `notify.mobile_app_handy` anpassen; die Sparten in der Bedingung nach Bedarf kürzen.
+Eine Automation für alle drei Ereignisse und alle Sparten. Gerät in `notify.mobile_app_handy` anpassen; die Sparten in der Bedingung nach Bedarf kürzen.
 
 ```yaml
 alias: "Notify: Störungsauskunft"
